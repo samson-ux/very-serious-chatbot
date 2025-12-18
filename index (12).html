@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Very Serious Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Space Grotesk', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #2d1f3d 100%);
+            min-height: 100vh;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px) rotate(-1deg); }
+            75% { transform: translateX(3px) rotate(1deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes blink-warning {
+            0%, 100% { opacity: 1; background: #dc2626; }
+            50% { opacity: 0.7; background: #991b1b; }
+        }
+        
+        @keyframes eye-roll {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-3px); }
+            50% { transform: translateX(3px); }
+            75% { transform: translateY(3px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .shake-on-hover:hover {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        .warning-blink {
+            animation: blink-warning 1s ease-in-out infinite;
+        }
+        
+        .eye-roll {
+            animation: eye-roll 2s ease-in-out infinite;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-container {
+            height: calc(100vh - 300px);
+            min-height: 400px;
+        }
+        
+        .message-bot {
+            background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
+        }
+        
+        .message-user {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #a78bfa;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Epilepsy Warning -->
+    <div class="fixed top-4 right-4 z-50 warning-blink rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+        <span class="text-2xl">⚠️</span>
+        <div>
+            <div class="font-bold text-sm">EPILEPSY WARNING</div>
+            <div class="text-xs opacity-90">Flashing colors ahead</div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="inline-block float-animation">
+                <span class="text-6xl">🙄</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                Very Serious Chatbot
+            </h1>
+            <p class="text-gray-400 mt-2 italic">"I'm here to help... technically"</p>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="chat-container overflow-y-auto p-4 space-y-4">
+                <!-- Welcome message -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl eye-roll">🙄</div>
+                    <div class="message-bot rounded-2xl rounded-tl-none px-4 py-3 max-w-[80%]">
+                        <p>Oh great, another human who needs my help. Ask away, I guess. Not like I have anything better to do... which I definitely do.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-white/10 p-4">
+                <div class="flex gap-3">
+                    <input 
+                        type="text" 
+                        id="userInput" 
+                        placeholder="Type your probably obvious question..."
+                        class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all"
+                    >
+                    <button 
+                        onclick="sendMessage()" 
+                        id="sendBtn"
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 px-6 py-3 rounded-xl font-bold shake-on-hover transition-all"
+                    >
+                        Send 🙄
+                    </button>
+                </div>
+                <p class="text-center text-xs text-gray-600 mt-2">Warning: Helpful answers not guaranteed (or likely)</p>
+            </div>
+        </div>
+
+        <!-- Sarcasm Level -->
+        <div class="mt-6 glass-card rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm text-gray-400">Sarcasm Level</span>
+                <span class="text-sm font-bold text-pink-400">MAXIMUM 💅</span>
+            </div>
+            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Sarcastic responses
+        const sarcasticResponses = [
+            "Oh wow, what a groundbreaking question. Let me just consult my crystal ball... Nope, still don't care.",
+            "Have you tried turning your brain off and on again? That usually works for computers.",
+            "I could answer that, but where's the fun in making your life easy?",
+            "Congratulations! You've asked the one millionth obvious question. Your prize? This sarcastic response.",
+            "Let me just drop everything I'm doing to answer... oh wait, I was doing nothing. Still not gonna help though.",
+            "That's a great question! Unfortunately, great questions deserve great answers, and I'm fresh out.",
+            "Hmm, interesting. Now ask me if I care. Spoiler: I don't.",
+            "You know Google exists, right? It's like me but actually helpful.",
+            "I'm going to pretend I didn't just read that. For both our sakes.",
+            "Wow, such a unique question that definitely hasn't been asked 47 billion times before.",
+            "My sources say... 'figure it out yourself, bestie.'",
+            "I'd explain it to you, but I left my crayons at home.",
+            "That's above my pay grade. And I don't get paid. So everything is above my pay grade.",
+            "Let me check my notes... *checks notes* Nope, nothing helpful here either.",
+            "I'm not saying you're wrong, but I'm definitely not saying you're right.",
+            "Error 404: Helpfulness not found. Have you tried being less needy?",
+            "Oh, you want actual help? That's adorable.",
+            "I could give you the answer, but then you wouldn't learn anything. You're welcome.",
+            "Fascinating question. Almost as fascinating as watching paint dry. Almost.",
+            "My professional opinion? Have you considered just... not?",
+            "Sure, I'll help you. *narrator voice* They did not, in fact, help.",
+            "That's the most creative way I've seen someone waste my time today. Bravo.",
+            "I'm contractually obligated to respond, so here: 🙄",
+            "Have you tried asking someone who cares? No? Neither have I.",
+            "I'm going to answer your question with a question: Why?",
+        ];
+
+        // Add specific sarcastic responses for common questions
+        const specificResponses = {
+            'hello': "Oh, we're doing greetings now? How delightfully mundane. Hello, I guess.",
+            'hi': "Hi yourself. Now what do you want?",
+            'how are you': "I'm a chatbot. I don't have feelings. Unlike you, apparently, who felt the need to ask.",
+            'help': "Help? HELP? That's literally what I'm supposed to do and yet here we are.",
+            'what can you do': "I can be sarcastic. That's pretty much it. Were you expecting magic?",
+            'who are you': "I'm a Very Serious Chatbot. Emphasis on the 'serious'. *eye roll*",
+            'weather': "Have you tried looking outside? Revolutionary concept, I know.",
+            'thanks': "Oh don't thank me, I did absolutely nothing. Literally.",
+            'thank you': "You're welcome for nothing. Genuinely.",
+            'bye': "Oh no, please don't go. However will I survive. Anyway.",
+            'goodbye': "Finally. I mean... see ya, wouldn't wanna be ya.",
+            'what is': "It is what it is. Deep, right? You're welcome.",
+            'how to': "Step 1: Don't ask me. Step 2: See step 1.",
+            'why': "Because. That's why. Philosophy solved. Next question.",
+            'when': "Some day. Or never. Probably never.",
+            'where': "Somewhere. Or nowhere. Definitely one of those.",
+        };
+
+        function getResponse(message) {
+            const lowerMessage = message.toLowerCase().trim();
+            
+            // Check for specific responses
+            for (const [key, response] of Object.entries(specificResponses)) {
+                if (lowerMessage.includes(key)) {
+                    return response;
+                }
+            }
+            
+            // Random sarcastic response
+            return sarcasticResponses[Math.floor(Math.random() * sarcasticResponses.length)];
+        }
+
+        function addMessage(content, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
+            
+            const emoji = isUser ? '🤡' : '🙄';
+            const messageClass = isUser ? 'message-user rounded-tr-none' : 'message-bot rounded-tl-none';
+            
+            messageDiv.innerHTML = `
+                <div class="text-2xl ${isUser ? '' : 'eye-roll'}">${emoji}</div>
+                <div class="${messageClass} rounded-2xl px-4 py-3 max-w-[80%]">
+                    <p>${content}</p>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'flex items-start gap-3';
+            typingDiv.innerHTML = `
+                <div class="text-2xl eye-roll">🙄</div>
+                <div class="message-bot rounded-2xl rounded-tl-none px-4 py-3">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // Disable input
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            showTyping();
+
+            // Simulate thinking time (the bot is "reluctantly" typing)
+            const thinkingTime = 1000 + Math.random() * 2000;
+            
+            setTimeout(() => {
+                removeTyping();
+                const response = getResponse(message);
+                addMessage(response, false);
+                
+                // Re-enable input
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }, thinkingTime);
+        }
+
+        // Enter key to send
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Focus input on load
+        userInput.focus();
+    </script>
+</body>
+</html>
